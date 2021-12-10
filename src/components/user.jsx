@@ -30,11 +30,11 @@ const User = ({ _id, name, qualities, profession, completedMeetings, rate, onDel
 User.propTypes = {
   _id: PropTypes.string,
   name: PropTypes.string,
-  qualities: PropTypes.object,
-  profession: PropTypes.string,
+  qualities: PropTypes.array,
+  profession: PropTypes.object,
   completedMeetings: PropTypes.number,
   rate: PropTypes.number,
-  bookmark: PropTypes.func,
+  bookmark: PropTypes.bool,
   onToggleBookMark: PropTypes.func,
   onDelete: PropTypes.func
 };
