@@ -24,10 +24,10 @@ const Users = ({ users, ...rest }) => {
   const handleProfessionSelect = (item) => {
     setSelectedProf(item);
   };
-
   const handlePageChange = (pageIndex) => {
     setCurrentPage(pageIndex);
   };
+
   const filteredUsers = selectedProf ? users.filter((user) => user.profession.name === selectedProf.name) : users;
   const count = filteredUsers.length;
   const userCrop = paginate(filteredUsers, currentPage, pageSize);
@@ -46,6 +46,7 @@ const Users = ({ users, ...rest }) => {
           </button>
         </div>
       )}
+
       <div className="d-flex flex-column">
         <SearchStatus length={count} />
         {count > 0 && (
@@ -61,6 +62,7 @@ const Users = ({ users, ...rest }) => {
                 <th />
               </tr>
             </thead>
+
             <tbody>
               {userCrop.map((user) => (
                 <User {...rest} {...user} key={user._id} />
