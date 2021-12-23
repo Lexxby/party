@@ -2,6 +2,7 @@ import React from 'react';
 import Qualitie from './qualitie';
 import BookMark from './bookmark';
 import PropTypes from 'prop-types';
+import { Link } from 'react-router-dom';
 
 const User = ({ _id, name, qualities, profession, completedMeetings, rate, onDelete, bookmark, onToggleBookMark }) => {
   return (

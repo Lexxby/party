@@ -6,7 +6,7 @@ import Table from './table';
 
 const UserTable = ({ users, onSort, selectedSort, onToggleBookMark, onDelete, ...rest }) => {
   const columns = {
-    name: { path: 'name', name: 'Имя' },
+    name: { path: 'name', name: 'Имя', component: (user) => <a href={`/users/${user._id}`}>{user.name}</a> },
     qualities: { name: 'Качества', component: (user) => <QualitiesList qualities={user.qualities} /> },
     profession: { path: 'profession.name', name: 'Профессия' },
     completedMeetings: { path: 'completedMeetings', name: 'Встретился, раз' },
