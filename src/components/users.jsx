@@ -9,6 +9,7 @@ import UserId from '../app/userId';
 import api from '../api';
 import { useParams } from 'react-router-dom';
 import _ from 'lodash';
+import TextField from './texetField';
 
 const Users = () => {
   const params = useParams();
@@ -21,6 +22,7 @@ const Users = () => {
   const [sortBy, setSortBy] = useState({ iter: 'name', order: 'asc' });
   const [users, setUsers] = useState([]);
   const [userById, setUserById] = useState();
+  const [search, setSearch] = useState('');
 
   useEffect(() => {
     api.users.default.getById(userId).then((data) => setUserById(data));
@@ -51,6 +53,7 @@ const Users = () => {
 
   useEffect(() => {
     setCurrentPage(1);
+    setSearch('');
   }, [selectedProf]);
 
   const handleProfessionSelect = (item) => {
@@ -64,15 +67,30 @@ const Users = () => {
     setSortBy(item);
   };
 
+  const handleSearch = ({ target }) => {
+    setSearch(target.value);
+  };
+
   if (users) {
     const filteredUsers = selectedProf ? users.filter((user) => user.profession.name === selectedProf.name) : users;
-    const count = filteredUsers.length;
-    const sortedUsers = _.orderBy(filteredUsers, [sortBy.path], [sortBy.order]);
+    let searchingPeople;
+    if (search === '') {
+      searchingPeople = filteredUsers;
+    } else {
+      searchingPeople = filteredUsers.filter((n) => n.name.includes(search));
+    }
+    const count = searchingPeople.length;
+    const sortedUsers = _.orderBy(searchingPeople, [sortBy.path], [sortBy.order]);
     const userCrop = paginate(sortedUsers, currentPage, pageSize);
 
     const clearFilter = () => {
       setSelectedProf(setCurrentPage(1));
     };
+
+    const badSmile = 'bi bi-emoji-frown';
+    const getError = searchingPeople.length === 0 ? 'Мы не нашли подходящих тебе людей, sorry ' : '';
+
+    console.log(searchingPeople);
 
     if (userId) {
       return <UserId user={userById} />;
@@ -90,6 +108,11 @@ const Users = () => {
 
           <div className="d-flex flex-column">
             <SearchStatus length={count} />
+            <div>
+              <TextField type="text" name="search" value={search} onChange={handleSearch} placeholder="Search..." />
+              <p className="form-text d-inline">{getError}</p>
+              <i className={badSmile}></i>
+            </div>
             {count > 0 && (
               <UserTable
                 users={userCrop}
@@ -99,6 +122,7 @@ const Users = () => {
                 onToggleBookMark={handleToggleBookMark}
               />
             )}
+
             <div className="d-flex justify-content-center">
               <Pagination itemsCount={count} pageSize={pageSize} currentPage={currentPage} onPageChange={handlePageChange} />
             </div>
