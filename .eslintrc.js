@@ -16,6 +16,7 @@ module.exports = {
     indent: 'off',
     semi: [2, 'always'],
     'space-before-function-paren': ['error', { anonymous: 'always', named: 'never' }],
-    'comma-dangle': ['error', 'never']
+    'comma-dangle': ['error', 'never'],
+    'multiline-ternary': ['off']
   }
 };
