@@ -17,6 +17,7 @@ module.exports = {
     semi: [2, 'always'],
     'space-before-function-paren': ['error', { anonymous: 'always', named: 'never' }],
     'comma-dangle': ['error', 'never'],
-    'multiline-ternary': ['off']
+    'multiline-ternary': ['off'],
+    'no-debugger': ['off']
   }
 };

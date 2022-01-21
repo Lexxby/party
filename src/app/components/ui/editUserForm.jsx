@@ -1,119 +1,72 @@
 import React, { useEffect, useState } from 'react';
-import { validator } from '../../utils/validator';
 import PropTypes from 'prop-types';
 import TextField from '../common/form/textField';
 import api from '../../api';
 import SelectField from '../common/form/selectField';
 import RadioField from '../common/form/radioField';
 import MultiSelectField from '../common/form/multiSelectField';
-import { useHistory } from 'react-router-dom';
+import { useRouteMatch, useHistory } from 'react-router-dom';
 
 const EditUserPage = () => {
-  const [data] = useState({
-    email: '',
-    password: '',
-    profession: '',
-    sex: 'male',
-    qualities: [],
-    licence: false
-  });
+  const match = useRouteMatch();
+  const [user, setUser] = useState();
+  const userId = match.params.userId;
   const history = useHistory();
-  const [user, setUser] = useState({});
-  const getUserById = history.location.pathname.split('/')[2];
+  const handleUsersRoute = () => {
+    history.push(`/users/${userId}`);
+  };
+
   const [qualities, setQualities] = useState({});
   const [professions, setProfession] = useState();
-  const [errors, setErrors] = useState({});
 
   useEffect(() => {
     api.professions.fetchAll().then((data) => setProfession(data));
     api.qualities.fetchAll().then((data) => setQualities(data));
   }, []);
   useEffect(() => {
-    api.users.getById(getUserById).then((data) => setUser(data));
+    api.users.getById(userId).then((data) => setUser(data));
   }, []);
 
   const handleChange = (target) => {
-    console.log('target', target);
-    setUser((prevState) => ({
-      ...prevState,
-      [target.name]: target.value
-    }));
-  };
-
-  // function optionsArray1(user) {
-  //   if (Array.isArray(user) && typeof user === 'object') {
-  //     return Object.keys(user).map((optionName) => ({
-  //       label: user[optionName].name,
-  //       value: user[optionName]._id
-  //     }));
-  //   } else {
-  //     return user;
-  //   }
-  // }
-
-  function test(user) {
-    user.value = user._id;
-    user.label = user.name;
-    delete user._id;
-    delete user.name;
-  }
-  test(user.qualities);
-
-  const validatorConfig = {
-    email: {
-      isRequired: {
-        message: 'Электронная почта обязательна для заполнения'
-      },
-      isEmail: {
-        message: 'Email введен некорректно'
-      }
-    },
-    profession: {
-      isRequired: {
-        message: 'Обязательно выберите вашу профессию'
-      }
+    if (target.name === 'profession') {
+      const convProf = Object.values(professions).filter((e) => e._id === target.value)[0];
+      setUser((prevState) => ({ ...prevState, profession: convProf }));
+    } else if (target.name === 'qualities') {
+      const convQual = target.value.map((data) => ({
+        _id: data.value,
+        name: data.label,
+        color: data.color
+      }));
+      setUser((prevState) => ({ ...prevState, qualities: convQual }));
+    } else if (target) {
+      setUser((prevState) => ({
+        ...prevState,
+        [target.name]: target.value
+      }));
     }
   };
-  useEffect(() => {
-    validate();
-  }, [data]);
-  const validate = () => {
-    const errors = validator(data, validatorConfig);
-    setErrors(errors);
-    return Object.keys(errors).length === 0;
-  };
-  const isValid = Object.keys(errors).length === 0;
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const isValid = validate();
-    if (!isValid) return;
-    console.log(data);
+    api.users.update(userId, user);
+    handleUsersRoute();
   };
+
   if (user) {
     return (
       <div className="container mt-5">
         <div className="row">
           <div className="col-md-6 offset-md-3 shadow p-4">
             <form onSubmit={handleSubmit}>
-              <TextField label="Имя" type="text" name="text" value={user.name} onChange={handleChange} error={errors.password} />
-              <TextField
-                label="Электронная почта"
-                type="text"
-                name="email"
-                value={user.email}
-                onChange={handleChange}
-                error={errors.email}
-              />
-
+              <TextField label="Имя" type="text" name="text" value={user.name} onChange={handleChange} />
+              <TextField label="Электронная почта" type="text" name="email" value={user.email} onChange={handleChange} />
               <SelectField
                 label="Выбери свою профессию"
                 defaultOption="Choose..."
                 options={professions}
                 name="profession"
                 onChange={handleChange}
-                value={user.profession}
-                error={errors.profession}
+                value={user.profession._id}
               />
               <RadioField
                 options={[
@@ -126,7 +79,6 @@ const EditUserPage = () => {
                 onChange={handleChange}
                 label="Выберите ваш пол"
               />
-
               <MultiSelectField
                 options={qualities}
                 onChange={handleChange}
@@ -134,14 +86,17 @@ const EditUserPage = () => {
                 name="qualities"
                 label="Выберите ваши качества"
               />
-              <button className="btn btn-primary w-100 mx-auto" type="submit" disabled={!isValid}>
-                Submit
+
+              <button className="btn btn-primary mx-auto" type="submit" onClick={handleSubmit}>
+                Сохранить изменения
               </button>
             </form>
           </div>
         </div>
       </div>
     );
+  } else {
+    return <h1 className="vstack gap-2 col-md-5 mx-auto mt-5">Loading...</h1>;
   }
 };
 
@@ -149,8 +104,7 @@ EditUserPage.propTypes = {
   name: PropTypes.string,
   value: PropTypes.bool,
   onChange: PropTypes.func,
-  children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]),
-  error: PropTypes.string
+  children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node])
 };
 
 export default EditUserPage;
