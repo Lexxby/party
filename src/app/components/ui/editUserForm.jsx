@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
+import { validator } from '../../utils/validator';
+// import PropTypes from 'prop-types';
 import TextField from '../common/form/textField';
 import api from '../../api';
 import SelectField from '../common/form/selectField';
@@ -15,9 +16,9 @@ const EditUserPage = () => {
   const handleUsersRoute = () => {
     history.push(`/users/${userId}`);
   };
-
   const [qualities, setQualities] = useState({});
   const [professions, setProfession] = useState();
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
     api.professions.fetchAll().then((data) => setProfession(data));
@@ -26,6 +27,32 @@ const EditUserPage = () => {
   useEffect(() => {
     api.users.getById(userId).then((data) => setUser(data));
   }, []);
+
+  const validatorConfig = {
+    name: {
+      isRequired: {
+        message: 'Имя обязателено для заполнения'
+      }
+    },
+    email: {
+      isRequired: {
+        message: 'Электронная почта обязательна для заполнения'
+      },
+      isEmail: {
+        message: 'Email введен некорректно'
+      }
+    }
+  };
+
+  useEffect(() => {
+    validate();
+  }, [user]);
+  const validate = () => {
+    const errors = validator(user, validatorConfig);
+    setErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+  const isValid = Object.keys(errors).length === 0;
 
   const handleChange = (target) => {
     if (target.name === 'profession') {
@@ -48,6 +75,8 @@ const EditUserPage = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    const isValid = validate();
+    if (!isValid) return;
     api.users.update(userId, user);
     handleUsersRoute();
   };
@@ -58,8 +87,8 @@ const EditUserPage = () => {
         <div className="row">
           <div className="col-md-6 offset-md-3 shadow p-4">
             <form onSubmit={handleSubmit}>
-              <TextField label="Имя" type="text" name="text" value={user.name} onChange={handleChange} />
-              <TextField label="Электронная почта" type="text" name="email" value={user.email} onChange={handleChange} />
+              <TextField label="Имя" name="name" value={user.name} onChange={handleChange} error={errors.name} />
+              <TextField label="Электронная почта" name="email" value={user.email} onChange={handleChange} error={errors.email} />
               <SelectField
                 label="Выбери свою профессию"
                 defaultOption="Choose..."
@@ -87,7 +116,7 @@ const EditUserPage = () => {
                 label="Выберите ваши качества"
               />
 
-              <button className="btn btn-primary mx-auto" type="submit" onClick={handleSubmit}>
+              <button className="btn btn-primary mx-auto" type="submit" onClick={handleSubmit} disabled={!isValid}>
                 Сохранить изменения
               </button>
             </form>
@@ -100,11 +129,11 @@ const EditUserPage = () => {
   }
 };
 
-EditUserPage.propTypes = {
-  name: PropTypes.string,
-  value: PropTypes.bool,
-  onChange: PropTypes.func,
-  children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node])
-};
+// EditUserPage.propTypes = {
+//   name: PropTypes.string,
+//   value: PropTypes.bool,
+//   onChange: PropTypes.func,
+//   children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node])
+// };
 
 export default EditUserPage;
