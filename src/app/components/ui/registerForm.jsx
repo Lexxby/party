@@ -17,7 +17,7 @@ const RegisterForm = () => {
     licence: false
   });
   const [qualities, setQualities] = useState({});
-  const [professions, setProfession] = useState();
+  const [professions, setProfession] = useState([]);
   const [errors, setErrors] = useState({});
   useEffect(() => {
     api.professions.fetchAll().then((data) => setProfession(data));
@@ -78,7 +78,7 @@ const RegisterForm = () => {
     e.preventDefault();
     const isValid = validate();
     if (!isValid) return;
-    return '';
+    console.log(data);
   };
   return (
     <form onSubmit={handleSubmit}>

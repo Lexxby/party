@@ -100,7 +100,7 @@ const UsersListPage = () => {
       </div>
     );
   }
-  return <h1 className="vstack gap-2 col-md-5 mx-auto mt-5">Loading...</h1>;
+  return 'loading...';
 };
 UsersListPage.propTypes = {
   users: PropTypes.array
