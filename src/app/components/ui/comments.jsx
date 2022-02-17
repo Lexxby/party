@@ -30,7 +30,7 @@ const Comments = () => {
       {sortedComments.length > 0 && (
         <div className="card mb-3">
           <div className="card-body ">
-            <h2>Комментарии</h2>
+            <h2>Comments</h2>
             <hr />
             <CommentsList comments={sortedComments} onRemove={handleRemoveComment} />
           </div>

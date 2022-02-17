@@ -56,17 +56,17 @@ const AddCommentForm = ({ onSubmit }) => {
     }));
   return (
     <div>
-      <h2>Новый комментарий</h2>
+      <h2>New comment</h2>
       <form onSubmit={handleSubmit}>
         <SelectField
           onChange={handleChange}
           options={arrayOfUsers}
           name="userId"
           value={data.userId}
-          defaultOption="Выбрать пользователя"
+          defaultOption="Выберите пользователя"
           error={errors.userId}
         />
-        <TextAreaField value={data.content} onChange={handleChange} name="content" label="Комментарий" error={errors.content} />
+        <TextAreaField value={data.content} onChange={handleChange} name="content" label="Сообщение" error={errors.content} />
         <div className="d-flex justify-content-end">
           <button className="btn btn-primary">Опубликовать</button>
         </div>
